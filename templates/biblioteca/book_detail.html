@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<div class="detail">
+  <div>{% include 'biblioteca/_cover.html' %}</div>
+  <div>
+    <div class="head" style="margin-bottom:.25rem"><h1>{{ book.title }}</h1>
+      {% if user.is_staff %}<a class="btn secondary" href="{% url 'book_update' book.pk %}">Editar</a>{% endif %}</div>
+    <p class="muted" style="margin-top:0">de {% for a in book.authors.all %}<a href="{{ a.get_absolute_url }}">{{ a.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    <p>{% include 'biblioteca/_stars.html' with rating=book.avg_rating %} {% if book.n_reviews %}<span class="muted">{{ book.avg_rating|floatformat:1 }} · {{ book.n_reviews }} reseña{{ book.n_reviews|pluralize }}</span>{% else %}<span class="muted">Sin valoraciones</span>{% endif %}</p>
+    <dl class="meta">
+      <dt>Género</dt><dd>{{ book.genre|default:"—" }}</dd>
+      <dt>Año</dt><dd>{{ book.year|default:"—" }}</dd>
+      <dt>ISBN</dt><dd><code>{{ book.isbn }}</code></dd>
+      <dt>Ejemplares</dt><dd>{{ book.available_copies }} disponible{{ book.available_copies|pluralize }} de {{ book.copies }}</dd>
+    </dl>
+    {% if book.description %}<p>{{ book.description|linebreaksbr }}</p>{% endif %}
+
+    <div class="card">
+      {% if not user.is_authenticated %}
+        <p style="margin:0"><a href="{% url 'login' %}?next={{ request.path }}">Entra</a> o <a href="{% url 'signup' %}">hazte socio</a> para pedirlo en préstamo.</p>
+      {% elif my_loan %}
+        <p>Lo tienes en préstamo hasta el <strong>{{ my_loan.due_date|date:"d/m/Y" }}</strong>{% if my_loan.is_overdue %} <span class="badge no">vencido</span>{% endif %}.</p>
+        <form method="post" action="{% url 'return_loan' my_loan.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn" type="submit">Devolver</button></form>
+      {% elif book.available_copies %}
+        <form method="post" action="{% url 'borrow' book.pk %}">{% csrf_token %}<button class="btn" type="submit">Pedir en préstamo</button></form>
+        <p class="muted" style="margin-bottom:0">Préstamo de 14 días · máximo 3 libros a la vez.</p>
+      {% else %}
+        <button class="btn" disabled>No hay ejemplares disponibles</button>
+      {% endif %}
+    </div>
+
+    {% if user.is_staff and active_loans_list %}
+    <div class="card"><h3 style="margin-top:0">Préstamos activos de este libro</h3>
+      <table>{% for l in active_loans_list %}<tr {% if l.is_overdue %}class="overdue"{% endif %}><td>{{ l.user.username }}</td><td>hasta {{ l.due_date|date:"d/m/Y" }}</td>
+        <td><form method="post" action="{% url 'return_loan' l.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn small secondary">Registrar devolución</button></form></td></tr>{% endfor %}</table>
+    </div>{% endif %}
+
+    <h2>Reseñas</h2>
+    {% if can_review %}
+    <form method="post" action="{% url 'add_review' book.pk %}" class="card form">{% csrf_token %}
+      {{ review_form.as_p }}<button class="btn" type="submit">Publicar reseña</button>
+    </form>
+    {% elif user.is_authenticated and not my_review %}<p class="muted">Podrás valorarlo cuando lo hayas tenido en préstamo.</p>{% endif %}
+    {% for r in reviews %}
+    <div class="review">
+      <strong>{{ r.user.username }}</strong> {% include 'biblioteca/_stars.html' with rating=r.rating %} <span class="muted">· {{ r.created_at|date:"d/m/Y" }}</span>
+      {% if r.comment %}<p style="margin:.3rem 0">{{ r.comment|linebreaksbr }}</p>{% endif %}
+      {% if r.user == user or user.is_staff %}<form method="post" action="{% url 'delete_review' r.pk %}">{% csrf_token %}<button class="btn small secondary">Eliminar</button></form>{% endif %}
+    </div>
+    {% empty %}<p class="muted">Aún no hay reseñas.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

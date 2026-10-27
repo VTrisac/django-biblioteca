@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Autores{% endblock %}
+{% block content %}
+<div class="head"><h1>Autores</h1>{% if user.is_staff %}<a class="btn" href="{% url 'author_create' %}">+ Nuevo autor</a>{% endif %}</div>
+<div class="card table-wrap"><table>
+  <tr><th>Nombre</th><th>Nacimiento</th><th>Libros</th></tr>
+  {% for a in author_list %}<tr><td><a href="{{ a.get_absolute_url }}">{{ a.name }}</a></td><td>{{ a.birth_year|default:"—" }}</td><td>{{ a.n_books }}</td></tr>
+  {% empty %}<tr><td colspan="3" class="empty">Sin autores.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

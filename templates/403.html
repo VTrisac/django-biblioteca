@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Sin permiso{% endblock %}
+{% block content %}
+<div class="card" style="max-width:560px"><h1>No tienes permiso</h1>
+  <p>Esta acción está reservada al rol <strong>Bibliotecario</strong>.</p>
+  <a class="btn" href="{% url 'book_list' %}">Volver al catálogo</a></div>
+{% endblock %}

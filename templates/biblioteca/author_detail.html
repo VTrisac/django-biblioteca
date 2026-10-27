@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}{{ author.name }}{% endblock %}
+{% block content %}
+<div class="head"><h1>{{ author.name }}{% if author.birth_year %} <small class="muted">({{ author.birth_year }})</small>{% endif %}</h1>
+  {% if user.is_staff %}<a class="btn secondary" href="{% url 'author_update' author.pk %}">Editar</a>{% endif %}</div>
+{% if author.bio %}<div class="card">{{ author.bio|linebreaks }}</div>{% endif %}
+<h2>Libros en el catálogo</h2>
+<div class="books">
+  {% for book in author.books.all %}<a class="book" href="{{ book.get_absolute_url }}">{% include 'biblioteca/_cover.html' %}<div class="info"><span class="title">{{ book.title }}</span><span class="meta">{{ book.year|default:"" }}</span></div></a>
+  {% empty %}<p class="empty">Ninguno todavía.</p>{% endfor %}
+</div>
+{% endblock %}

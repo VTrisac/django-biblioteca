@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="head"><h1>{% if object %}Editar autor{% else %}Nuevo autor{% endif %}</h1></div>
+<div class="card" style="max-width:560px"><form method="post" class="form">{% csrf_token %}{{ form.as_p }}
+  <button class="btn" type="submit">Guardar</button> <a class="btn secondary" href="{% url 'author_list' %}">Cancelar</a></form></div>
+{% endblock %}

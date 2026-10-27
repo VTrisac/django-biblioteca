@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Entrar{% endblock %}
+{% block content %}
+<div class="auth card">
+  <h1>Biblioteca Digital</h1>
+  <p class="muted">Préstamos, historial y reseñas de libros.</p>
+  <form method="post" class="form">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+  <p class="muted">¿No tienes cuenta? <a href="{% url 'signup' %}">Regístrate</a></p>
+</div>
+{% endblock %}

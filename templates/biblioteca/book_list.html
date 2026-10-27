@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="head">
+  <h1>Catálogo</h1>
+  {% if user.is_staff %}<div><a class="btn secondary" href="{% url 'author_create' %}">+ Autor</a> <a class="btn" href="{% url 'book_create' %}">+ Nuevo libro</a></div>{% endif %}
+</div>
+<div class="layout">
+  <aside class="card">
+    <h2 style="margin-top:0;font-size:1.15rem">Buscador avanzado</h2>
+    <form method="get" class="search">
+      {{ form.as_p }}
+      <button class="btn" type="submit">Buscar</button>
+      <a class="btn secondary" href="{% url 'book_list' %}">Limpiar</a>
+    </form>
+  </aside>
+  <section>
+    <p class="muted">{{ paginator.count }} libro{{ paginator.count|pluralize }}</p>
+    <div class="books">
+      {% for book in book_list %}
+      <a class="book" href="{{ book.get_absolute_url }}">
+        {% include 'biblioteca/_cover.html' %}
+        <div class="info">
+          <span class="title">{{ book.title }}</span>
+          <span class="meta">{% for a in book.authors.all %}{{ a.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
+          <span>{% include 'biblioteca/_stars.html' with rating=book.avg_rating %} {% if book.n_reviews %}<small class="muted">({{ book.n_reviews }})</small>{% endif %}</span>
+          <span>{% if book.available_copies %}<span class="badge ok">Disponible ({{ book.available_copies }})</span>{% else %}<span class="badge no">Prestado</span>{% endif %}</span>
+        </div>
+      </a>
+      {% empty %}<p class="empty">No hay libros que coincidan con la búsqueda.</p>{% endfor %}
+    </div>
+    {% include 'biblioteca/_pagination.html' %}
+  </section>
+</div>
+{% endblock %}

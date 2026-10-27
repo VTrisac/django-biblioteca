@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Mis préstamos{% endblock %}
+{% block content %}
+<div class="head"><h1>Mis préstamos</h1></div>
+<section class="card table-wrap">
+  <h2 style="margin-top:0">En préstamo ahora</h2>
+  <table>
+    <tr><th>Libro</th><th>Prestado el</th><th>Devolver antes de</th><th></th></tr>
+    {% for l in active %}
+    <tr {% if l.is_overdue %}class="overdue"{% endif %}><td><a href="{{ l.book.get_absolute_url }}">{{ l.book.title }}</a></td><td>{{ l.loan_date|date:"d/m/Y" }}</td>
+      <td>{{ l.due_date|date:"d/m/Y" }} {% if l.is_overdue %}<span class="badge no">vencido</span>{% endif %}</td>
+      <td><form method="post" action="{% url 'return_loan' l.pk %}">{% csrf_token %}<button class="btn small">Devolver</button></form></td></tr>
+    {% empty %}<tr><td colspan="4" class="empty">No tienes libros en préstamo. <a href="{% url 'book_list' %}">Explora el catálogo</a>.</td></tr>{% endfor %}
+  </table>
+</section>
+<section class="card table-wrap">
+  <h2 style="margin-top:0">Historial</h2>
+  <table>
+    <tr><th>Libro</th><th>Prestado el</th><th>Devuelto el</th><th></th></tr>
+    {% for l in history %}
+    <tr><td><a href="{{ l.book.get_absolute_url }}">{{ l.book.title }}</a></td><td>{{ l.loan_date|date:"d/m/Y" }}</td><td>{{ l.returned_at|date:"d/m/Y" }}</td>
+      <td>{% if l.returned_at > l.due_date %}<span class="badge warn">con retraso</span>{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="4" class="empty">Aún no has devuelto ningún libro.</td></tr>{% endfor %}
+  </table>
+</section>
+{% endblock %}

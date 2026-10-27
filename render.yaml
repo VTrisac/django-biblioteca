@@ -1,0 +1,22 @@
+# Blueprint de Render: servicio web.
+# Render solo permite una base de datos PostgreSQL gratuita por cuenta (la usa el proyecto de inventario),
+# así que esta demo usa SQLite: build.sh migra y carga los datos de ejemplo en cada despliegue.
+# Para usar PostgreSQL basta con definir la variable DATABASE_URL.
+services:
+  - type: web
+    name: biblioteca
+    runtime: python
+    plan: free
+    buildCommand: bash build.sh
+    startCommand: python -m gunicorn config.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: SERVE_MEDIA
+        value: "True"
+      - key: WEB_CONCURRENCY
+        value: 2

@@ -1,0 +1,1 @@
+{% if book.cover %}<img class="cover" src="{{ book.cover.url }}" alt="Portada de {{ book.title }}" loading="lazy">{% else %}<div class="cover placeholder" style="--c1: hsl({% widthratio book.pk 1 47 %}, 45%, 35%); --c2: hsl({% widthratio book.pk 1 47 %}, 40%, 16%)">{{ book.title }}</div>{% endif %}

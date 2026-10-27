@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Hazte socio{% endblock %}
+{% block content %}
+<div class="auth card">
+  <h1>Hazte socio</h1>
+  <p class="muted">Como socio puedes pedir hasta 3 libros a la vez durante 14 días y valorar los que hayas leído.</p>
+  <form method="post" class="form">{% csrf_token %}{{ form.as_p }}<button class="btn" type="submit">Crear cuenta</button></form>
+  <p class="muted">¿Ya tienes cuenta? <a href="{% url 'login' %}">Entra</a></p>
+</div>
+{% endblock %}

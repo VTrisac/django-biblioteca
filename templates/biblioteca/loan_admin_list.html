@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Gestión de préstamos{% endblock %}
+{% block content %}
+<div class="head"><h1>Gestión de préstamos</h1>
+  <div class="tabs">
+    <a class="btn small secondary {% if estado == 'activos' %}active{% endif %}" href="?estado=activos">Activos</a>
+    <a class="btn small secondary {% if estado == 'vencidos' %}active{% endif %}" href="?estado=vencidos">Vencidos</a>
+    <a class="btn small secondary {% if estado == 'devueltos' %}active{% endif %}" href="?estado=devueltos">Devueltos</a>
+    <a class="btn small secondary {% if estado == 'todos' %}active{% endif %}" href="?estado=todos">Todos</a>
+  </div>
+</div>
+<div class="card table-wrap"><table>
+  <tr><th>Libro</th><th>Socio</th><th>Prestado</th><th>Vence</th><th>Devuelto</th><th></th></tr>
+  {% for l in loan_list %}
+  <tr {% if l.is_overdue %}class="overdue"{% endif %}><td><a href="{{ l.book.get_absolute_url }}">{{ l.book.title }}</a></td><td>{{ l.user.username }}</td>
+    <td>{{ l.loan_date|date:"d/m/Y" }}</td><td>{{ l.due_date|date:"d/m/Y" }}{% if l.is_overdue %} <span class="badge no">vencido</span>{% endif %}</td>
+    <td>{{ l.returned_at|date:"d/m/Y"|default:"—" }}</td>
+    <td>{% if l.is_active %}<form method="post" action="{% url 'return_loan' l.pk %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn small secondary">Registrar devolución</button></form>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="6" class="empty">No hay préstamos en este estado.</td></tr>{% endfor %}
+</table>{% include 'biblioteca/_pagination.html' %}</div>
+{% endblock %}

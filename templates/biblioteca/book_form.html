@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="head"><h1>{% if object %}Editar «{{ object.title }}»{% else %}Nuevo libro{% endif %}</h1></div>
+<div class="card" style="max-width:680px">
+  <form method="post" enctype="multipart/form-data" class="form">{% csrf_token %}
+    {{ form.as_p }}
+    <p class="muted">¿Falta el autor? <a href="{% url 'author_create' %}" target="_blank">Créalo aquí</a> y recarga.</p>
+    <button class="btn" type="submit">Guardar</button>
+    <a class="btn secondary" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'book_list' %}{% endif %}">Cancelar</a>
+  </form>
+</div>
+{% endblock %}
